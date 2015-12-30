@@ -4,7 +4,7 @@
 #include <vector>
 #include <stack>
 #include "Object.h"
-
+#include "Singleton.h"
 namespace base
 {
     class AutoReleasePool
@@ -34,15 +34,10 @@ namespace base
         std::vector<Object*> m_objects;
     };
 
-    class PoolManager
+    class PoolManager : public Singleton<PoolManager>
     {
+		friend class Singleton<PoolManager>;
     public:
-        static void CreateInstance();
-        static void DestroyInstance();
-        static PoolManager* Instance() {
-            return m_instance;
-        }
-
         void AddObject(Object* obj) {
             if (m_pools.empty()) {
                 Push();
@@ -66,9 +61,15 @@ namespace base
         }
 
     private:
-        PoolManager();
-        ~PoolManager();
-        static PoolManager* m_instance;
+        PoolManager(){}
+        ~PoolManager()
+		 {
+			while (!m_pools.empty()) 
+			{
+				delete m_pools.top();
+				m_pools.pop();
+			}
+		}
         std::stack<AutoReleasePool*> m_pools;
     };
 }

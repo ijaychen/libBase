@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string.h>
+#include "Logger.h"
 
 namespace base
 {
@@ -82,6 +83,11 @@ namespace base
 			PutByte(reinterpret_cast<const uint8_t *>(&val), 1);
 		}
 		
+		void WriteBuffer(const uint8_t * src, size_t count)
+		{
+			PutByte(src, count);	
+		}
+		
 		uint32_t ReadUShort()
 		{
 			uint16_t val;
@@ -100,6 +106,7 @@ namespace base
 		{
 			uint16_t len;
 			GetByte(reinterpret_cast<char *>(&len), 2);
+			LOG_DEBUG("ReadString(len:%d)",len);
 			str.resize(len);
 			char * dst = const_cast<char*>(str.c_str());
 			GetByte(dst, len);
@@ -131,7 +138,7 @@ namespace base
 				m_storage.resize(HEAD_SIZE);
 			}
 			//WriteUShort(htons(m_storage.size() - HEAD_SIZE + 2));
-			WriteUShort(m_storage.size() - HEAD_SIZE + 2);
+			WriteUShort(m_storage.size());
 			WriteUShort(m_opCode);
 		}
 		void print()

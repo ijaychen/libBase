@@ -2,6 +2,9 @@
 #include "Object.h"
 #include "WorldPacket.h"
 #include "utils/IntrusiveList.h"
+#include "memory/MemoryPool.h"
+#include "tmp/Gateway.h"
+#include "event/Dispatcher.h"
 
 using namespace std;
 
@@ -43,9 +46,27 @@ void test()
 	}
 }
 
+void testNet()
+{
+	base::memory::MemoryPool* mempool = new base::memory::MemoryPool ( 64, 1280 );
+	Gateway::CreateInstance();
+	
+	//Gateway gateway(*mempool);
+	sGateway.SetMemoryPool(mempool);
+	sGateway.Setup("192.168.0.92", 11888);
+	while(1)
+	{
+		g_dispatcher->Dispatch();
+		usleep(50);
+	}
+	SAFE_DELETE(mempool);
+}
+
 int main()
 {
 	test();
+	testNet();
+	Gateway::DestroyInstance();
 	cout << "g_object_count: " << base::g_object_count << endl;
 	return 0;
 }

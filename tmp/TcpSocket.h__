@@ -1,0 +1,87 @@
+#ifndef TCPSOCKET_H
+#define TCPSOCKET_H
+
+#include "../net/Client.h"
+#include "../Logger.h"
+#include <string>
+
+#define CMSG_LOGIN 15
+
+class TcpSocket : public base::net::Client
+{
+public:
+	TcpSocket(base::memory::MemoryPool& mempool) : Client(mempool)
+	{
+		
+	}
+	
+	virtual void OnConnect()
+	{
+		LOG_ERROR("OnConnect=======\n");
+	}
+	
+	void SendPacket(base::WorldPacket& packet)
+	{
+		packet.WriteHead();
+		Send((const char *)packet.GetBuffer(), packet.GetSize());
+	}
+	
+	virtual void OnConnectFail(int eno, const char* reason)
+	{
+		
+	}
+	virtual void OnClose()
+	{
+		
+	}
+	void ProcPacket(base::WorldPacket & pack)
+	{
+		uint16_t opcode = pack.GetOpcode();
+		LOG_DEBUG("ProcPacket(opcode:%d)\n", opcode);
+		switch(opcode)
+		{
+		case CMSG_LOGIN:
+		{
+			std::string server_name, account_name, passwd;
+			server_name = pack.ReadString();
+			account_name = pack.ReadString();
+			passwd = pack.ReadString();
+			LOG_DEBUG("server_name:%s, account_name:%s,password:%s", server_name.c_str(),account_name.c_str(),passwd.c_str());
+			break;
+		}		
+		default:
+		break;	
+		}		
+	}
+	
+	virtual void OnReceive(std::size_t count)
+	{		
+		// 解析数据包
+		while (count >= base::WorldPacket::HEAD_SIZE) {			
+			//LOG_DEBUG("OnReceive(count:%d)",count);
+			CopyReceive(m_pkHead.data, sizeof(m_pkHead));
+			LOG_DEBUG("m_pkHead.head.size:%d",m_pkHead.head.size);
+			if (m_pkHead.head.size >= base::WorldPacket::HEAD_SIZE) {
+				if (count >= m_pkHead.head.size) {
+					
+					uint16_t opCode = m_pkHead.head.opCode;			
+					base::WorldPacket pkin(opCode, m_pkHead.head.size);
+					pkin.Resize(m_pkHead.head.size);
+			
+					PopReceive((char*)pkin.GetBuffer(), m_pkHead.head.size);
+					count -= m_pkHead.head.size;
+					ProcPacket(pkin);
+				} else {
+					// 不足以够成一个完整的数据包
+					break;
+				}
+			} else {
+				
+			}
+		}
+	}
+	private:
+		base::WorldPacket::PacketHead m_pkHead; 
+};
+
+#endif

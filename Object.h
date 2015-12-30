@@ -37,7 +37,7 @@ namespace base
 extern uint32_t g_object_count;
 }
 
-#define SAFE_RELEASE(obj) do { if(ojb != nullptr) { obj->Release(); obj == nullptr; }} while(0);
+#define SAFE_RELEASE(obj) do { if(obj != nullptr) { obj->Release(); obj == nullptr; }} while(0);
 
 #endif
 
