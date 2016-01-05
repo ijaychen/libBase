@@ -1,6 +1,5 @@
 #ifndef BASE_NET_CLIENT_H
 #define BASE_NET_CLIENT_H
-
 #include "../event/EventIO.h"
 #include "../memory/MemoryChunk.h"
 #include "../Logger.h"
@@ -47,7 +46,7 @@ namespace base
             // 连接指定地址, 异步操作
             // 连接成功将调用OnConnect, 连接失败将调用OnConnectFail
             void Connect(const char* ipaddr, int port);
-
+			
 			void Send(const char * src, uint32_t count);
 			/*{
 				cout << "=========Send count:" << count << endl;
@@ -96,6 +95,7 @@ namespace base
             virtual void OnEventIOReadable();
             virtual void OnEventIOWriteable();
             virtual void OnEventIOClose();
+			
             void OnConnectSuccess() {
                 connect_ = true;
                 OnConnect();

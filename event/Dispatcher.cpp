@@ -71,10 +71,12 @@ namespace base
                         EventIO* evobj = static_cast<EventIO*>(evtbuf_[i].data.ptr);
                         if (!evobj->closed() && ((evtbuf_[i].events & EPOLLIN) | (evtbuf_[i].events & EPOLLERR))) 
 						{
+							LOG_DEBUG("OnEventIOReadable");
                             evobj->OnEventIOReadable();
                         }
                         if (!evobj->closed() && (evtbuf_[i].events & EPOLLOUT)) 
 						{
+							LOG_DEBUG("OnEventIOWriteable");
                             evobj->OnEventIOWriteable();
                         }
                     }
@@ -84,7 +86,7 @@ namespace base
                     EventIO* cur = closed_io_list_.front();
                     cur->OnEventIOClose();
                     io_list_.erase(cur);
-                    cur->Release();
+                    //cur->Release();
                     closed_io_list_.pop();
                 }
             }

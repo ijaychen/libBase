@@ -48,6 +48,7 @@ namespace base
             virtual void OnEventIOWriteable() = 0;
             // fd关闭时
             virtual void OnEventIOClose() = 0;
+			
             int m_ioevt;
             int m_fd;
             bool m_closed;

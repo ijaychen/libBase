@@ -3,6 +3,7 @@
 #include "../memory/MemoryPool.h"
 #include "../utils/String.h"
 #include "../Logger.h"
+#include "../event/Dispatcher.h"
 #include <sys/socket.h>
 #include <cerrno>
 #include <unistd.h>
@@ -26,8 +27,7 @@ namespace base
         }
 
         void Client::Connect(const char* ipaddr, int port)
-        {
-	  
+        {	  
             ipaddr_ = ipaddr;
             port_ = port;
             int clientfd = ::socket(AF_INET, SOCK_STREAM, 0);
@@ -38,9 +38,8 @@ namespace base
             AddToDispatcher(clientfd, event::IO_WRITEABLE);
             int rc = ::connect(clientfd, (sockaddr*)&addr, sizeof(struct sockaddr_in));
             if (rc == -1) {
-	      		  
+				LOG_ERROR("connect rc:%d, %d,%s",EINPROGRESS, errno,strerror(errno));
                 if (errno != EINPROGRESS) {
-
                     OnConnectFail(errno, strerror(errno));
                     Close();
                 } else {
@@ -49,10 +48,11 @@ namespace base
             } else {
                 OnConnectSuccess();
             }
-        }
-
-        void Client::OnEventIOReadable()
+        }		
+		
+		void Client::OnEventIOReadable()
         {
+			LOG_DEBUG("OnEventIOReadable");
             // 不停的读，直到没有数据可读或是出现EAGAIN错误时
             while (connect() && !closed()) {
                 if (recvp_.size() < RECVP_SIZE) {
@@ -112,6 +112,7 @@ namespace base
                             Close();
                         }
                     } else {
+						LOG_ERROR("Close Client rc:%d", rc);
                         Close(); // 正常关闭 rc == 0
                     }
                     break;
@@ -121,6 +122,8 @@ namespace base
 
         void Client::OnEventIOWriteable()
         {
+			LOG_DEBUG("======OnEventIOWriteable=======");
+			LOG_DEBUG("connect_pending_:%d",connect_pending_);
             if (connect_pending_) {
                 CheckIfConnectCompleted();
             }

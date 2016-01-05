@@ -1,8 +1,11 @@
 #ifndef TCPSOCKET_H
 #define TCPSOCKET_H
-
+#include "../WorldPacket.h"
 #include "../net/Client.h"
 #include "../Logger.h"
+#include <sys/socket.h>
+#include <cerrno>
+#include <unistd.h>
 namespace base
 {
 	namespace net
@@ -34,7 +37,9 @@ namespace base
 				SendPacket(injectedPacket);
 			}
 			
-			virtual void OnConnectFail(int eno, const char* reason)	{}
+			virtual void OnConnectFail(int eno, const char* reason)	{
+				LOG_ERROR("socket connect fail(eno:%d,%s)", eno, reason);
+			}
 			virtual void OnClose(){	}
 			virtual void ProcPacket(WorldPacket & pack) = 0;
 			virtual void OnReceive(std::size_t count)

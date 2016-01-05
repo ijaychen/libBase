@@ -32,7 +32,11 @@ namespace base
 
             // 正常退出（直到没有未决的事件）
             void NormalExit();
-
+			
+			bool IsErase(EventIO* evi)
+			{
+				return !io_list_.contains(evi);
+			}
         private:
             Dispatcher();         
             utils::IntrusiveList<EventIO> io_list_;

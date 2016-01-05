@@ -1,4 +1,5 @@
-set(DIR_BASE_ROOT "/home/jason/workspace/mybase")
+set(DIR_BASE_ROOT "/home/jason/workspace/aha/mybase")
 
 set(DIR_BASE_INCLUDE "${DIR_BASE_ROOT}")
+set(DIR_3RD_LIB "${DIR_BASE_ROOT}/../3rd")
 
